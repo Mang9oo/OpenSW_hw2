@@ -2,25 +2,26 @@ import telegram
 import asyncio
 import schedule
 import time
-from datetime import datetime
+import datetime
+import pytz
 
-async def send_message(chat_id, text):
-    token = "6804735527:AAFvVD6okO8SVtHL9sI6eLymUSs9VB7GdDw"
-    bot = telegram.Bot(token=token)
-    await bot.sendMessage(chat_id=chat_id, text=text)
+token = "6804735527:AAFvVD6okO8SVtHL9sI6eLymUSs9VB7GdDw"
+bot = telegram.Bot(token = token)
+public_chat_name = "@k20222test"
 
-async def send_scheduled_message():
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
+async def job():
+    now = datetime.datetime.now(pytz.timezone('Asia/Seoul'))
 
-    if 6 <= now.hour < 23:
-        print("Sending message at", current_time)
-        chat_id = "-1001923723841"
-        text = "30분뒤에 자동으로 알람해주는 서비스 !!!!!!!"
-        await send_message(chat_id, text)
+    if now.hour >=23 or now.hour <=6:
+        return
 
-schedule.every(30).minutes.do(lambda: asyncio.run(send_scheduled_message()))
+    id_channel = await bot.sendMessage(chat_id = public_chat_name, text = "30분뒤에 자동으로 알람해주는 서비스 !!!!!!!")
+    print(id_channel)
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+async def main():
+    while True:
+        await job()
+        await asyncio.sleep(1800)
+
+if __name__ == "__main__":
+    asyncio.run(main())
